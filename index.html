@@ -54,7 +54,7 @@
             { value: 'eau-potable', label: "Utilisation de l'eau potable" },
           ];
 
-          // Mapping des options de nature pour chaque catégorie (exemple pour quelques catégories)
+          // Mapping des options de nature pour chaque catégorie
           const natureOptionsMap = {
             'abattage-arbres': [
               { value: 'arbre-mort', label: "Abattage d'arbre mort malade ou dangereux" },
@@ -99,6 +99,43 @@
               { value: 'construction-balcon-15', label: "Construction ou modification d'un balcon, galerie, perron et autre plate-forme situés à plus de 1,5 mètre du sol" },
               { value: 'construction-balcon-06-15', label: "Construction ou modification d'un balcon, galerie, perron et autre plate-forme situés entre 0,6 et 1,5 mètre du sol" },
             ],
+            'construction-commerciale': [
+              { value: 'addition-equipement', label: "Addition d'un équipement ou d'une construction accessoire commerciale" },
+              { value: 'agrandissement-batiment', label: "Agrandissement d'un bâtiment principal" },
+              { value: 'amenagement-stationnement', label: "Aménagement ou réaménagement d'une aire de stationnement" },
+              { value: 'construction-piscine', label: "Construction, installation ou remplacement d'une piscine creusée incluant les travaux d'excavation" },
+              { value: 'demolition-accessoire-comite', label: "Démolition d'un bâtiment accessoire avec autorisation du comité de démolition" },
+              { value: 'demolition-accessoire-non-assujetie', label: "Démolition d'un bâtiment accessoire non assujetti au comité de démolition" },
+              { value: 'demolition-principal-comite', label: "Démolition d'un bâtiment principal avec autorisation du comité de démolition" },
+              { value: 'demolition-principal-non-assujetie', label: "Démolition d'un bâtiment principal non assujetti au comité de démolition" },
+            ],
+            'construction-industrielle': [
+              { value: 'addition-equipement', label: "Addition d'un équipement accessoire tel que dépoussiéreur, compacteur, pont-roullant, etc." },
+              { value: 'agrandissement-batiment', label: "Agrandissement d'un bâtiment principal" },
+              { value: 'amenagement-espace', label: "Aménagement d'un espace de chargement ou de déchargement" },
+              { value: 'amenagement-stationnement', label: "Aménagement, réaménagement ou agrandissement d'une aire de stationnement" },
+            ],
+            'construction-institutionnelle': [
+              { value: 'addition-equipement', label: "Addition d'un équipement accessoire tel que composteur, compacteur, aire de jeux, etc." },
+              { value: 'agrandissement-batiment', label: "Agrandissement d'un bâtiment principal" },
+              { value: 'amenagement-espace', label: "Aménagement d'un espace de chargement ou de déchargement" },
+              { value: 'amenagement-stationnement', label: "Aménagement, réaménagement ou agrandissement d'une aire de stationnement" },
+            ],
+            'construction-subvention': [
+              { value: 'demolition-principal-comite', label: "Démolition d'un bâtiment principal avec autorisation du comité de démolition" },
+              { value: 'demolition-principal-non-assujetie', label: "Démolition d'un bâtiment principal non assujetti au comité de démolition" },
+              { value: 'nouvelle-construction-acceslogis', label: "Nouvelle construction résidentielle avec programme AccèsLogis" },
+              { value: 'renovation-acceslogis', label: "Rénovation avec programme AccèsLogis" },
+              { value: 'renovation-adaptation', label: "Rénovation avec programme d'adaptation de domicile" },
+              { value: 'renovation-petits-etablissements', label: "Rénovation avec programme petits établissements admissibles" },
+              { value: 'renovation-quebec', label: "Rénovation avec programme Rénovation Québec" },
+            ],
+            'demande-analyse': [
+              { value: 'analyse-generale', label: "Analyse générale" },
+              { value: 'analyse-ppcmoi', label: "Analyse particulier de construction, de modification ou d'occupation d'un immeuble (PPCMOI)" },
+              { value: 'analyse-usage-conditionnel', label: "Analyse pour approbation d'un usage conditionnel" },
+              { value: 'analyse-derogation', label: "Analyse pour dérogation mineure" },
+            ],
             'demande-discretionnaire': [
               { value: 'approbation-usage', label: "Approbation d'un usage conditionnel" },
               { value: 'autorisation-demolition-accessoire', label: "Autorisation de démolition d'un bâtiment accessoire pour un immeuble patrimonial" },
@@ -110,10 +147,58 @@
               { value: 'piia-residentiel', label: "P.I.I.A. Résidentiel - Construction et agrandissement" },
               { value: 'ppcmoi', label: "Projet particulier de construction, de modification ou d'occupation d'un immeuble (PPCMOI)" },
             ],
+            'demande-subvention': [
+              { value: 'pea', label: "PEA-Petits établissements accessibles" },
+              { value: 'programme-aide', label: "Programme d'aide complémentaire AccèsLogis" },
+            ],
             'eau-potable': [
               { value: 'arrosage-pelouse', label: "Permis arrosage nouvelle pelouse" },
               { value: 'borne-fontaine', label: "Utilisation d'une borne fontaine (adresse à proximité)" },
             ],
+            'occupation-temporaire': [
+              { value: 'emprise-rue', label: "De l'emprise de rue" },
+              { value: 'fermeture-50', label: "Fermeture de rue de 50 Km/h et plus" },
+              { value: 'fermeture-moins-50', label: "Fermeture de rue de moins de 50 Km/h" },
+              { value: 'occupation-3m', label: "Occupation de plus de 3 mètres dans la rue" },
+            ],
+            'permis-lotissement': [
+              { value: 'lotissement', label: "Permis de lotissement" },
+              { value: 'lotissement-programme', label: "Permis de lotissement avec programme" },
+            ],
+            'permis-vendeur': [
+              { value: 'vendeur-osbl-greenfield', label: "Vendeur itinérant - OSBL- / Utiliser - 001 dans le champ \"numéro de lot\" pour arr. Greenfield Park" },
+              { value: 'vendeur-osbl-hubert', label: "Vendeur itinérant - OSBL- / Utiliser - 002 dans le champ \"numéro de lot\" pour arr. St-Hubert" },
+              { value: 'vendeur-osbl-longueuil', label: "Vendeur itinérant - OSBL- / Utiliser - 003 dans le champ \"numéro de lot\" pour arr. Longueuil" },
+            ],
+            'intervention-rtu': [
+              { value: 'consentement-hydro', label: "1.1 RTU - Demande de consentement municipal - Hydro-Québec" },
+              { value: 'consentement-energir', label: "1.2 RTU - Demande de consentement municipal - Energir" },
+              { value: 'consentement-bell', label: "1.3 RTU - Demande de consentement municipal - Bell" },
+              { value: 'consentement-videotron', label: "1.4 RTU - Demande de consentement municipal - Vidéotron" },
+              { value: 'consentement-rogers', label: "1.5 RTU - Demande de consentement municipal - Rogers" },
+              { value: 'consentement-telus', label: "1.6 RTU - Demande de consentement municipal - Telus" },
+              { value: 'consentement-autre', label: "1.7 RTU - Demande de consentement municipal - Autre" },
+              { value: 'avis-hydro-avec', label: "2.1 RTU - Avis d'intervention - Hydro-Québec avec consentement" },
+              { value: 'avis-hydro-sans', label: "2.1 RTU - Avis d'intervention - Hydro-Québec sans consentement" },
+              { value: 'avis-energir-avec', label: "2.2 RTU - Avis d'intervention - Energir avec consentement" },
+              { value: 'avis-energir-sans', label: "2.2 RTU - Avis d'intervention - Energir sans consentement" },
+              { value: 'avis-bell-avec', label: "2.3 RTU - Avis d'intervention - Bell avec consentement" },
+              { value: 'avis-bell-sans', label: "2.3 RTU - Avis d'intervention - Bell sans consentement" },
+              { value: 'avis-videotron-avec', label: "2.4 RTU - Avis d'intervention - Vidéotron avec consentement" },
+              { value: 'avis-videotron-sans', label: "2.4 RTU - Avis d'intervention - Vidéotron sans consentement" },
+              { value: 'avis-rogers-avec', label: "2.5 RTU - Avis d'intervention - Rogers avec consentement" },
+              { value: 'avis-rogers-sans', label: "2.5 RTU - Avis d'intervention - Rogers sans consentement" },
+              { value: 'avis-telus-avec', label: "2.6 RTU - Avis d'intervention - Telus avec consentement" },
+              { value: 'avis-telus-sans', label: "2.6 RTU - Avis d'intervention - Telus sans consentement" },
+              { value: 'avis-autre-avec', label: "2.7 RTU - Avis d'intervention - Autre avec consentement" },
+              { value: 'avis-autre-sans', label: "2.7 RTU - Avis d'intervention - Autre sans consentement" },
+            ],
+          };
+
+          // Fonctions de débogage pour vérifier les options disponibles
+          const debugCategoryOptions = (cat) => {
+            console.log(`Catégorie sélectionnée: ${cat}`);
+            console.log(`Options disponibles:`, natureOptionsMap[cat] || []);
           };
 
           // Vérifie si la catégorie est liée à la construction
@@ -133,7 +218,13 @@
           // Mise à jour des options de nature quand la catégorie change
           useEffect(() => {
             if (category) {
-              setNatureOptions(natureOptionsMap[category] || []);
+              console.log(`Mise à jour pour la catégorie: ${category}`);
+              
+              // Vérifier si des options existent pour cette catégorie
+              const options = natureOptionsMap[category] || [];
+              console.log(`Nombre d'options trouvées: ${options.length}`);
+              
+              setNatureOptions(options);
               setNature(''); // Réinitialiser la nature lorsque la catégorie change
               
               // Vérifier si nous devons afficher un avertissement pour une demande discrétionnaire
@@ -151,7 +242,6 @@
           }, [category]);
 
           // Activer/désactiver le bouton Suivant en fonction de la sélection de la nature
-          // et de la nécessité d'une demande discrétionnaire
           useEffect(() => {
             setIsNextButtonEnabled(!!nature && !needsDiscretionaryRequest);
           }, [nature, needsDiscretionaryRequest]);
@@ -159,6 +249,9 @@
           // Gestionnaire de changement de catégorie
           const handleCategoryChange = (e) => {
             const newCategory = e.target.value;
+            
+            // Déboguer pour voir les options disponibles
+            debugCategoryOptions(newCategory);
             
             // Si l'utilisateur essaie de sélectionner une catégorie de construction alors qu'une demande
             // discrétionnaire est nécessaire et n'a pas encore été réalisée
@@ -277,7 +370,7 @@
                   {/* Indicateur d'aide si aucune option n'est disponible */}
                   {category && natureOptions.length === 0 && (
                     <p className="mt-2 text-sm text-red-600">
-                      Aucune option disponible pour cette catégorie.
+                      Aucune option disponible pour cette catégorie. Données attendues pour {category}.
                     </p>
                   )}
                 </div>
