@@ -19,216 +19,292 @@
         const { useState, useEffect } = React;
 
         const PermitForm = () => {
-            // États pour les sélections de l'utilisateur
-            const [category, setCategory] = useState('');
-            const [nature, setNature] = useState('');
-            const [showDiscretionaryWarning, setShowDiscretionaryWarning] = useState(false);
-            const [natureOptions, setNatureOptions] = useState([]);
-            const [isNextButtonEnabled, setIsNextButtonEnabled] = useState(false);
+          // États pour les sélections de l'utilisateur
+          const [category, setCategory] = useState('');
+          const [nature, setNature] = useState('');
+          const [showDiscretionaryWarning, setShowDiscretionaryWarning] = useState(false);
+          const [needsDiscretionaryRequest, setNeedsDiscretionaryRequest] = useState(false);
+          const [natureOptions, setNatureOptions] = useState([]);
+          const [isNextButtonEnabled, setIsNextButtonEnabled] = useState(false);
+          const [redirectToDiscretionary, setRedirectToDiscretionary] = useState(false);
 
-            // Données simulées pour la grille de zonage
-            const mockZoningGrid = {
-                // Simuler si cette adresse a une indication P.I.I.A.
-                hasPIIA: true
-            };
+          // Données simulées pour la grille de zonage (basées sur l'adresse des travaux)
+          const mockZoningGrid = {
+            // Simuler si cette adresse a une indication P.I.I.A.
+            hasPIIA: true
+          };
 
-            // Données des catégories de permis
-            const categories = [
-                { value: 'abattage-arbres', label: "Certificat d'autorisation - Abattage d'arbre(s)" },
-                { value: 'usages', label: "Certificat d'autorisation - Usages" },
-                { value: 'construction-agricole', label: "Construction et/ou rénovation agricole" },
-                { value: 'construction-subvention', label: "Construction et/ou rénovation avec programme subvention" },
-                { value: 'construction-commerciale', label: "Construction et/ou rénovation commerciale" },
-                { value: 'construction-industrielle', label: "Construction et/ou rénovation industrielle" },
-                { value: 'construction-institutionnelle', label: "Construction et/ou rénovation institutionnelle" },
-                { value: 'construction-residentielle', label: "Construction et/ou rénovation résidentielle" },
-                { value: 'demande-analyse', label: "Demande d'analyse" },
-                { value: 'demande-subvention', label: "Demande de subvention" },
-                { value: 'demande-discretionnaire', label: "Demande discrétionnaire" },
-                { value: 'occupation-temporaire', label: "Occupation temporaire du domaine public" },
-                { value: 'permis-lotissement', label: "Permis de lotissement" },
-                { value: 'permis-vendeur', label: "Permis vendeur itinérant (sollicitation)" },
-                { value: 'intervention-rtu', label: "Traitement d'une demande d'intervention RTU" },
-                { value: 'eau-potable', label: "Utilisation de l'eau potable" },
+          // Données des catégories de permis
+          const categories = [
+            { value: 'abattage-arbres', label: "Certificat d'autorisation - Abattage d'arbre(s)" },
+            { value: 'usages', label: "Certificat d'autorisation - Usages" },
+            { value: 'construction-agricole', label: "Construction et/ou rénovation agricole" },
+            { value: 'construction-subvention', label: "Construction et/ou rénovation avec programme subvention" },
+            { value: 'construction-commerciale', label: "Construction et/ou rénovation commerciale" },
+            { value: 'construction-industrielle', label: "Construction et/ou rénovation industrielle" },
+            { value: 'construction-institutionnelle', label: "Construction et/ou rénovation institutionnelle" },
+            { value: 'construction-residentielle', label: "Construction et/ou rénovation résidentielle" },
+            { value: 'demande-analyse', label: "Demande d'analyse" },
+            { value: 'demande-subvention', label: "Demande de subvention" },
+            { value: 'demande-discretionnaire', label: "Demande discrétionnaire" },
+            { value: 'occupation-temporaire', label: "Occupation temporaire du domaine public" },
+            { value: 'permis-lotissement', label: "Permis de lotissement" },
+            { value: 'permis-vendeur', label: "Permis vendeur itinérant (sollicitation)" },
+            { value: 'intervention-rtu', label: "Traitement d'une demande d'intervention RTU" },
+            { value: 'eau-potable', label: "Utilisation de l'eau potable" },
+          ];
+
+          // Mapping des options de nature pour chaque catégorie (exemple pour quelques catégories)
+          const natureOptionsMap = {
+            'abattage-arbres': [
+              { value: 'arbre-mort', label: "Abattage d'arbre mort malade ou dangereux" },
+              { value: 'arbre-sain-20cm', label: "Abattage d'arbre(s) sain(s) de 20 cm de diamètre et plus" },
+              { value: 'arbre-sain-5-20cm', label: "Abattage d'arbre(s) sain(s) de 5 cm à 20 cm de diamètre" },
+              { value: 'frene', label: "Abattage d'un frêne" },
+            ],
+            'usages': [
+              { value: 'activites-communautaires', label: "Activités communautaires extérieures" },
+              { value: 'bazars', label: "Bazars" },
+              { value: 'certificat-complementaire', label: "Certificat d'autorisation complémentaire à un usage résidentiel" },
+              { value: 'certificat-place-affaires', label: "Certificat d'autorisation de place d'affaires (usage)" },
+              { value: 'evenement-special', label: "Évènement spécial" },
+              { value: 'installation-cirque', label: "Installation d'un cirque" },
+              { value: 'tenue-foire', label: "Tenue d'une foire" },
+              { value: 'parc-amusement', label: "Un parc d'amusement" },
+              { value: 'vente-arbre-noel', label: "Vente d'arbres de Noël" },
+              { value: 'vente-horticulture', label: "Vente d'articles saisonniers d'horticulture" },
+              { value: 'vente-trottoir', label: "Vente sous la tente et/ou vente trottoir" },
+            ],
+            'construction-agricole': [
+              { value: 'agrandissement-agricole', label: "Agrandissement d'un bâtiment agricole" },
+              { value: 'demolition-principal-comite', label: "Démolition d'un bâtiment principal avec autorisation du comité de démolition" },
+              { value: 'demolition-principal-non-assujetie', label: "Démolition d'un bâtiment principal non assujetti au comité de démolition" },
+              { value: 'installation-cloture', label: "Installation d'une clôture" },
+              { value: 'nouvelle-construction-agricole', label: "Nouvelle construction d'un bâtiment agricole" },
+              { value: 'ouvrage-rive', label: "Ouvrage dans la rive, le littoral ou la plaine inondable" },
+              { value: 'transformation-renovation', label: "Transformation ou rénovation d'un bâtiment agricole" },
+              { value: 'travaux-branchement', label: "Travaux de branchement privé au réseau d'aqueduc et/ou d'égout municipal" },
+              { value: 'travaux-remblai', label: "Travaux de remblai ou déblai" },
+              { value: 'trottoir-bordure', label: "Trottoir ou bordure de rue, demande de modification" },
+            ],
+            'construction-residentielle': [
+              { value: 'agrandissement-batiment', label: "Agrandissement d'un bâtiment principal" },
+              { value: 'ajout-portes-fenetres', label: "Ajout, modification ou retrait de porte(s) et/ou fenêtre(s)" },
+              { value: 'amenagement-stationnement', label: "Aménagement, réaménagement ou agrandissement d'une aire de stationnement" },
+              { value: 'construction-abri-auto', label: "Construction d'un abri d'auto permanent" },
+              { value: 'construction-garage', label: "Construction d'un garage isolé" },
+              { value: 'construction-vestibule', label: "Construction d'un vestibule ou d'un escalier encloisonné, salle de boue" },
+              { value: 'construction-veranda', label: "Construction d'une véranda ou installation d'un solarium" },
+              { value: 'construction-balcon-06', label: "Construction ou modification d'un balcon, galerie, perron et autre plate-forme situés à 0,6 mètre et moins du sol" },
+              { value: 'construction-balcon-15', label: "Construction ou modification d'un balcon, galerie, perron et autre plate-forme situés à plus de 1,5 mètre du sol" },
+              { value: 'construction-balcon-06-15', label: "Construction ou modification d'un balcon, galerie, perron et autre plate-forme situés entre 0,6 et 1,5 mètre du sol" },
+            ],
+            'demande-discretionnaire': [
+              { value: 'approbation-usage', label: "Approbation d'un usage conditionnel" },
+              { value: 'autorisation-demolition-accessoire', label: "Autorisation de démolition d'un bâtiment accessoire pour un immeuble patrimonial" },
+              { value: 'autorisation-demolition-accessoire-programme', label: "Autorisation de démolition d'un bâtiment accessoire pour un immeuble patrimonial avec programme S.H.Q., P.A.D. ou accès Logis" },
+              { value: 'autorisation-demolition-1940', label: "Autorisation de démolition d'un immeuble construit avant 1940" },
+              { value: 'derogation-mineure', label: "Dérogation mineure" },
+              { value: 'piia-affichage', label: "P.I.I.A. Affichage" },
+              { value: 'piia-construction', label: "P.I.I.A. Construction et agrandissement d'un bâtiment mixte" },
+              { value: 'piia-residentiel', label: "P.I.I.A. Résidentiel - Construction et agrandissement" },
+              { value: 'ppcmoi', label: "Projet particulier de construction, de modification ou d'occupation d'un immeuble (PPCMOI)" },
+            ],
+            'eau-potable': [
+              { value: 'arrosage-pelouse', label: "Permis arrosage nouvelle pelouse" },
+              { value: 'borne-fontaine', label: "Utilisation d'une borne fontaine (adresse à proximité)" },
+            ],
+          };
+
+          // Vérifie si la catégorie est liée à la construction
+          const isConstructionCategory = (cat) => {
+            const constructionCategories = [
+              'construction-agricole',
+              'construction-subvention',
+              'construction-commerciale',
+              'construction-industrielle',
+              'construction-institutionnelle',
+              'construction-residentielle'
             ];
+            
+            return constructionCategories.includes(cat);
+          };
 
-            // Mapping des options de nature pour chaque catégorie
-            const natureOptionsMap = {
-                'abattage-arbres': [
-                    { value: 'arbre-mort', label: "Abattage d'arbre mort malade ou dangereux" },
-                    { value: 'arbre-sain-20cm', label: "Abattage d'arbre(s) sain(s) de 20 cm de diamètre et plus" },
-                    { value: 'arbre-sain-5-20cm', label: "Abattage d'arbre(s) sain(s) de 5 cm à 20 cm de diamètre" },
-                    { value: 'frene', label: "Abattage d'un frêne" },
-                ],
-                'usages': [
-                    { value: 'activites-communautaires', label: "Activités communautaires extérieures" },
-                    { value: 'bazars', label: "Bazars" },
-                    { value: 'certificat-complementaire', label: "Certificat d'autorisation complémentaire à un usage résidentiel" },
-                    { value: 'certificat-place-affaires', label: "Certificat d'autorisation de place d'affaires (usage)" },
-                    { value: 'evenement-special', label: "Évènement spécial" },
-                    { value: 'installation-cirque', label: "Installation d'un cirque" },
-                    { value: 'tenue-foire', label: "Tenue d'une foire" },
-                    { value: 'parc-amusement', label: "Un parc d'amusement" },
-                    { value: 'vente-arbre-noel', label: "Vente d'arbres de Noël" },
-                    { value: 'vente-horticulture', label: "Vente d'articles saisonniers d'horticulture" },
-                    { value: 'vente-trottoir', label: "Vente sous la tente et/ou vente trottoir" },
-                ],
-                'construction-agricole': [
-                    { value: 'agrandissement-agricole', label: "Agrandissement d'un bâtiment agricole" },
-                    { value: 'demolition-principal-comite', label: "Démolition d'un bâtiment principal avec autorisation du comité de démolition" },
-                    { value: 'demolition-principal-non-assujetie', label: "Démolition d'un bâtiment principal non assujetti au comité de démolition" },
-                    { value: 'installation-cloture', label: "Installation d'une clôture" },
-                    { value: 'nouvelle-construction-agricole', label: "Nouvelle construction d'un bâtiment agricole" },
-                    { value: 'ouvrage-rive', label: "Ouvrage dans la rive, le littoral ou la plaine inondable" },
-                ],
-                'construction-residentielle': [
-                    { value: 'agrandissement-batiment', label: "Agrandissement d'un bâtiment principal" },
-                    { value: 'ajout-portes-fenetres', label: "Ajout, modification ou retrait de porte(s) et/ou fenêtre(s)" },
-                    { value: 'amenagement-stationnement', label: "Aménagement, réaménagement ou agrandissement d'une aire de stationnement" },
-                    { value: 'construction-abri-auto', label: "Construction d'un abri d'auto permanent" },
-                    { value: 'construction-garage', label: "Construction d'un garage isolé" },
-                    { value: 'construction-vestibule', label: "Construction d'un vestibule ou d'un escalier encloisonné, salle de boue" },
-                    { value: 'construction-veranda', label: "Construction d'une véranda ou installation d'un solarium" },
-                ],
-                'eau-potable': [
-                    { value: 'arrosage-pelouse', label: "Permis arrosage nouvelle pelouse" },
-                    { value: 'borne-fontaine', label: "Utilisation d'une borne fontaine (adresse à proximité)" },
-                ],
-            };
+          // Mise à jour des options de nature quand la catégorie change
+          useEffect(() => {
+            if (category) {
+              setNatureOptions(natureOptionsMap[category] || []);
+              setNature(''); // Réinitialiser la nature lorsque la catégorie change
+              
+              // Vérifier si nous devons afficher un avertissement pour une demande discrétionnaire
+              const requiresDiscretionary = isConstructionCategory(category) && mockZoningGrid.hasPIIA;
+              setShowDiscretionaryWarning(requiresDiscretionary);
+              setNeedsDiscretionaryRequest(requiresDiscretionary);
+              
+              // Si l'utilisateur sélectionne la catégorie demande discrétionnaire, 
+              // on désactive le blocage de demande discrétionnaire
+              if (category === 'demande-discretionnaire') {
+                setNeedsDiscretionaryRequest(false);
+                setShowDiscretionaryWarning(false);
+              }
+            }
+          }, [category]);
 
-            // Vérifie si la catégorie est liée à la construction
-            const isConstructionCategory = (cat) => {
-                return cat.startsWith('construction-');
-            };
+          // Activer/désactiver le bouton Suivant en fonction de la sélection de la nature
+          // et de la nécessité d'une demande discrétionnaire
+          useEffect(() => {
+            setIsNextButtonEnabled(!!nature && !needsDiscretionaryRequest);
+          }, [nature, needsDiscretionaryRequest]);
 
-            // Mise à jour des options de nature quand la catégorie change
-            useEffect(() => {
-                if (category) {
-                    setNatureOptions(natureOptionsMap[category] || []);
-                    setNature(''); // Réinitialiser la nature lorsque la catégorie change
-                    
-                    // Vérifier si nous devons afficher un avertissement pour une demande discrétionnaire
-                    if (isConstructionCategory(category) && mockZoningGrid.hasPIIA) {
-                        setShowDiscretionaryWarning(true);
-                    } else {
-                        setShowDiscretionaryWarning(false);
-                    }
-                }
-            }, [category]);
+          // Gestionnaire de changement de catégorie
+          const handleCategoryChange = (e) => {
+            const newCategory = e.target.value;
+            
+            // Si l'utilisateur essaie de sélectionner une catégorie de construction alors qu'une demande
+            // discrétionnaire est nécessaire et n'a pas encore été réalisée
+            if (isConstructionCategory(newCategory) && mockZoningGrid.hasPIIA && !redirectToDiscretionary) {
+              setCategory(newCategory);
+            } else {
+              setCategory(newCategory);
+            }
+          };
 
-            // Activer/désactiver le bouton Suivant en fonction de la sélection de la nature
-            useEffect(() => {
-                setIsNextButtonEnabled(!!nature);
-            }, [nature]);
+          // Gestionnaire de changement de nature
+          const handleNatureChange = (e) => {
+            setNature(e.target.value);
+          };
 
-            // Gestionnaire de changement de catégorie
-            const handleCategoryChange = (e) => {
-                setCategory(e.target.value);
-            };
+          // Gestionnaire pour rediriger vers le formulaire de demande discrétionnaire
+          const handleDiscretionaryRequest = () => {
+            // En situation réelle, on redirigerait vers un autre formulaire
+            // Pour cette simulation, on change juste la catégorie
+            setCategory('demande-discretionnaire');
+            setRedirectToDiscretionary(true);
+            setNeedsDiscretionaryRequest(false);
+          };
 
-            // Gestionnaire de changement de nature
-            const handleNatureChange = (e) => {
-                setNature(e.target.value);
-            };
+          // Simuler le passage à l'étape suivante
+          const handleNext = () => {
+            if (isNextButtonEnabled) {
+              alert('Passage à l\'étape suivante du formulaire');
+              // Ici, vous ajouteriez la logique pour passer à l'étape suivante
+            }
+          };
 
-            // Simuler le passage à l'étape suivante
-            const handleNext = () => {
-                if (isNextButtonEnabled) {
-                    alert('Passage à l\'étape suivante du formulaire');
-                    // Ici, vous ajouteriez la logique pour passer à l'étape suivante
-                }
-            };
-
-            return (
-                <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-                    <h1 className="text-3xl font-bold text-blue-600 mb-8">Demande en ligne - Adresse de la demande</h1>
-                    
-                    <div className="bg-white p-5 rounded border border-gray-200 mb-8">
-                        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Type de demande</h2>
-                        
-                        {/* Sélection de la catégorie */}
-                        <div className="mb-6">
-                            <label htmlFor="category" className="block text-gray-700 font-medium mb-2">
-                                Catégorie <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                id="category"
-                                value={category}
-                                onChange={handleCategoryChange}
-                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                                <option value="" disabled>Sélectionnez...</option>
-                                {categories.map((cat) => (
-                                    <option key={cat.value} value={cat.value}>
-                                        {cat.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        
-                        {/* Message d'avertissement pour demande discrétionnaire */}
-                        {showDiscretionaryWarning && (
-                            <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-6">
-                                <p className="text-yellow-700">
-                                    Selon l'indication à la rangée « P.I.I.A. » dans la grille de zonage associée à l'adresse des travaux, 
-                                    une demande discrétionnaire est requise avant de pouvoir déposer une demande de permis de construction.
-                                </p>
-                            </div>
-                        )}
-                        
-                        {/* Sélection de la nature de la demande */}
-                        <div className="mb-6">
-                            <label htmlFor="nature" className="block text-gray-700 font-medium mb-2">
-                                Nature de la demande <span className="text-red-500">*</span>
-                            </label>
-                            <div className="relative">
-                                <select
-                                    id="nature"
-                                    value={nature}
-                                    onChange={handleNatureChange}
-                                    disabled={!category}
-                                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    <option value="" disabled>Sélectionnez...</option>
-                                    {natureOptions.map((opt) => (
-                                        <option key={opt.value} value={opt.value}>
-                                            {opt.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                {category && natureOptions.length > 0 && nature && (
-                                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                        <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
-                                        </svg>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        
-                        {/* Informations supplémentaires */}
-                        <div className="text-gray-500 text-sm italic flex items-center mt-8">
-                            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd"></path>
-                            </svg>
-                            Le texte de cette page ne remplace pas celui du ou des règlements en vigueur.
-                        </div>
-                    </div>
-                    
-                    {/* Bouton Suivant */}
-                    <div className="flex justify-end">
-                        <button
-                            onClick={handleNext}
-                            disabled={!isNextButtonEnabled}
-                            className={`px-6 py-2 rounded-md text-white font-medium ${
-                                isNextButtonEnabled ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'
-                            }`}
-                        >
-                            Suivant
-                        </button>
-                    </div>
+          return (
+            <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+              <h1 className="text-3xl font-bold text-blue-600 mb-8">Demande en ligne - Adresse de la demande</h1>
+              
+              <div className="bg-white p-5 rounded border border-gray-200 mb-8">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-6">Type de demande</h2>
+                
+                {/* Sélection de la catégorie */}
+                <div className="mb-6">
+                  <label htmlFor="category" className="block text-gray-700 font-medium mb-2">
+                    Catégorie <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="category"
+                    value={category}
+                    onChange={handleCategoryChange}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="" disabled>Sélectionnez...</option>
+                    {categories.map((cat) => (
+                      <option key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-            );
+                
+                {/* Message d'avertissement pour demande discrétionnaire */}
+                {showDiscretionaryWarning && (
+                  <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-6">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-yellow-700">
+                          Selon l'indication à la rangée « P.I.I.A. » dans la grille de zonage associée à l'adresse des travaux, 
+                          une demande discrétionnaire est requise avant de pouvoir déposer une demande de permis de construction.
+                        </p>
+                        <div className="mt-2">
+                          <button
+                            type="button"
+                            onClick={handleDiscretionaryRequest}
+                            className="text-sm px-3 py-1 font-medium bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
+                          >
+                            Déposer une demande discrétionnaire
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Sélection de la nature de la demande */}
+                <div className="mb-6">
+                  <label htmlFor="nature" className="block text-gray-700 font-medium mb-2">
+                    Nature de la demande <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="nature"
+                      value={nature}
+                      onChange={handleNatureChange}
+                      disabled={!category}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="" disabled>Sélectionnez...</option>
+                      {natureOptions.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    {category && natureOptions.length > 0 && nature && (
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  {/* Indicateur d'aide si aucune option n'est disponible */}
+                  {category && natureOptions.length === 0 && (
+                    <p className="mt-2 text-sm text-red-600">
+                      Aucune option disponible pour cette catégorie.
+                    </p>
+                  )}
+                </div>
+                
+                {/* Informations supplémentaires */}
+                <div className="text-gray-500 text-sm italic flex items-center mt-8">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd"></path>
+                  </svg>
+                  Le texte de cette page ne remplace pas celui du ou des règlements en vigueur.
+                </div>
+              </div>
+              
+              {/* Bouton Suivant */}
+              <div className="flex justify-end">
+                <button
+                  onClick={handleNext}
+                  disabled={!isNextButtonEnabled}
+                  className={`px-6 py-2 rounded-md text-white font-medium ${
+                    isNextButtonEnabled ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  Suivant
+                </button>
+              </div>
+            </div>
+          );
         };
 
         // Rendre le composant dans le DOM
