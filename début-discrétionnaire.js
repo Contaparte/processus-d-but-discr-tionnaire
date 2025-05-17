@@ -283,11 +283,44 @@ const PermitForm = () => {
     
     return constructionCategories.includes(cat);
   };
+  
+  // Fonction de débogage pour afficher les options disponibles
+  const debugCategoryOptions = (cat) => {
+    console.log(`Catégorie sélectionnée: ${cat}`);
+    console.log(`Options disponibles:`, natureOptionsMap[cat] || []);
+  };
+
+  // Convertir les noms de catégories et de natures pour l'affichage dans la console
+  const getDebugNames = () => {
+    console.log("Catégories:");
+    categories.forEach(cat => {
+      console.log(`${cat.value}: ${cat.label}`);
+    });
+    
+    console.log("Options de nature par catégorie:");
+    Object.keys(natureOptionsMap).forEach(catKey => {
+      console.log(`${catKey}:`);
+      natureOptionsMap[catKey].forEach(opt => {
+        console.log(`  ${opt.value}: ${opt.label}`);
+      });
+    });
+  };
+  
+  // Appeler cette fonction une fois au début pour vérifier les correspondances
+  useEffect(() => {
+    getDebugNames();
+  }, []);
 
   // Mise à jour des options de nature quand la catégorie change
   useEffect(() => {
     if (category) {
-      setNatureOptions(natureOptionsMap[category] || []);
+      console.log(`Mise à jour pour la catégorie: ${category}`);
+      
+      // Vérifier si des options existent pour cette catégorie
+      const options = natureOptionsMap[category] || [];
+      console.log(`Nombre d'options trouvées: ${options.length}`);
+      
+      setNatureOptions(options);
       setNature(''); // Réinitialiser la nature lorsque la catégorie change
       
       // Vérifier si nous devons afficher un avertissement pour une demande discrétionnaire
@@ -313,6 +346,9 @@ const PermitForm = () => {
   // Gestionnaire de changement de catégorie
   const handleCategoryChange = (e) => {
     const newCategory = e.target.value;
+    
+    // Déboguer pour voir les options disponibles
+    debugCategoryOptions(newCategory);
     
     // Si l'utilisateur essaie de sélectionner une catégorie de construction alors qu'une demande
     // discrétionnaire est nécessaire et n'a pas encore été réalisée
@@ -431,7 +467,7 @@ const PermitForm = () => {
           {/* Indicateur d'aide si aucune option n'est disponible */}
           {category && natureOptions.length === 0 && (
             <p className="mt-2 text-sm text-red-600">
-              Aucune option disponible pour cette catégorie.
+              Aucune option disponible pour cette catégorie. Données attendues pour {category}.
             </p>
           )}
         </div>
