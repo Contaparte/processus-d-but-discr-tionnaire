@@ -8,8 +8,9 @@ const PermitForm = () => {
   const [needsDiscretionaryRequest, setNeedsDiscretionaryRequest] = useState(false);
   const [natureOptions, setNatureOptions] = useState([]);
   const [isNextButtonEnabled, setIsNextButtonEnabled] = useState(false);
+  const [redirectToDiscretionary, setRedirectToDiscretionary] = useState(false);
 
-  // Données simulées pour la grille de zonage
+  // Données simulées pour la grille de zonage (basées sur l'adresse des travaux)
   const mockZoningGrid = {
     // Simuler si cette adresse a une indication P.I.I.A.
     hasPIIA: true
@@ -79,31 +80,82 @@ const PermitForm = () => {
       { value: 'construction-balcon-06', label: "Construction ou modification d'un balcon, galerie, perron et autre plate-forme situés à 0,6 mètre et moins du sol" },
       { value: 'construction-balcon-15', label: "Construction ou modification d'un balcon, galerie, perron et autre plate-forme situés à plus de 1,5 mètre du sol" },
       { value: 'construction-balcon-06-15', label: "Construction ou modification d'un balcon, galerie, perron et autre plate-forme situés entre 0,6 et 1,5 mètre du sol" },
+      { value: 'construction-piscine-creusee', label: "Construction, installation ou remplacement d'une piscine creusée incluant les travaux d'excavation" },
+      { value: 'construction-piscine-hors-terre', label: "Construction, installation ou remplacement d'une piscine hors terre ou démontable incluant les travaux d'excavation" },
+      { value: 'demolition-reservoir', label: "Démolir tout ou partie d'un réservoir ou d'une piscine creusée" },
+      { value: 'demolition-accessoire-comite', label: "Démolition d'un bâtiment accessoire avec autorisation du comité de démolition" },
+      { value: 'demolition-accessoire-non-assujetie', label: "Démolition d'un bâtiment accessoire non assujetti au comité de démolition" },
+      { value: 'demolition-principal-comite', label: "Démolition d'un bâtiment principal avec autorisation du comité de démolition" },
+      { value: 'demolition-principal-non-assujetie', label: "Démolition d'un bâtiment principal non assujetti au comité de démolition" },
+      { value: 'deplacement-batiment', label: "Déplacement d'un bâtiment sur un autre propriété" },
+      { value: 'drain-francais', label: "Drain Français" },
+      { value: 'installation-conteneur', label: "Installation d'un conteneur à matières résiduelles au sol" },
+      { value: 'installation-poulailler', label: "Installation d'un poulailler urbain" },
+      { value: 'installation-reservoir', label: "Installation d'un réservoir de gaz propane ou autres combustibles" },
     ],
     'construction-commerciale': [
-      { value: 'construction-equipement', label: "Addition d'un équipement ou d'une construction accessoire commerciale" },
+      { value: 'addition-equipement', label: "Addition d'un équipement ou d'une construction accessoire commerciale" },
       { value: 'agrandissement-batiment', label: "Agrandissement d'un bâtiment principal" },
       { value: 'amenagement-stationnement', label: "Aménagement ou réaménagement d'une aire de stationnement" },
       { value: 'construction-piscine', label: "Construction, installation ou remplacement d'une piscine creusée incluant les travaux d'excavation" },
-      { value: 'demolition-accessoire', label: "Démolition d'un bâtiment accessoire avec autorisation du comité de démolition" },
+      { value: 'demolition-accessoire-comite', label: "Démolition d'un bâtiment accessoire avec autorisation du comité de démolition" },
+      { value: 'demolition-accessoire-non-assujetie', label: "Démolition d'un bâtiment accessoire non assujetti au comité de démolition" },
+      { value: 'demolition-principal-comite', label: "Démolition d'un bâtiment principal avec autorisation du comité de démolition" },
+      { value: 'demolition-principal-non-assujetie', label: "Démolition d'un bâtiment principal non assujetti au comité de démolition" },
+      { value: 'enseigne-petite', label: "Enseigne de moins de 2,5m² (installation, modification, agrandissement, enlèvement, réinstallation)" },
+      { value: 'enseigne-grande', label: "Enseigne de plus de 2,5m² (installation, modification, agrandissement, enlèvement, réinstallation)" },
+      { value: 'installation-conteneur', label: "Installation d'un contenant de récupération de textiles" },
+      { value: 'installation-cloture', label: "Installation d'une clôture" },
+      { value: 'installation-terrasse-saisonniere', label: "Installation d'une terrasse saisonnière ou permanente" },
+      { value: 'installation-terrasse-temporaire', label: "Installation d'une terrasse temporaire dans l'emprise" },
+      { value: 'installation-septique', label: "Installation septique" },
       { value: 'nouvelle-construction', label: "Nouvelle construction d'un bâtiment principal" },
+      { value: 'nouvelle-construction-mixte', label: "Nouvelle construction d'un bâtiment principal à usage mixte" },
+      { value: 'ouvrage-rive', label: "Ouvrage dans la rive, le littoral ou la plaine inondable" },
       { value: 'transformation-renovation', label: "Transformation ou rénovation d'un bâtiment principal" },
+      { value: 'travaux-branchement', label: "Travaux de branchement privé au réseau d'aqueduc et/ou d'égout municipal" },
+      { value: 'travaux-remblai', label: "Travaux de remblai ou déblai" },
+      { value: 'trottoir-bordure', label: "Trottoir ou bordure de rue, demande de modification" },
     ],
     'construction-industrielle': [
       { value: 'addition-equipement', label: "Addition d'un équipement accessoire tel que dépoussiéreur, compacteur, pont-roullant, etc." },
       { value: 'agrandissement-batiment', label: "Agrandissement d'un bâtiment principal" },
       { value: 'amenagement-espace', label: "Aménagement d'un espace de chargement ou de déchargement" },
       { value: 'amenagement-stationnement', label: "Aménagement, réaménagement ou agrandissement d'une aire de stationnement" },
+      { value: 'demolition-accessoire-comite', label: "Démolition d'un bâtiment accessoire avec autorisation du comité de démolition" },
+      { value: 'demolition-accessoire-non-assujetie', label: "Démolition d'un bâtiment accessoire non assujetti au comité de démolition" },
+      { value: 'demolition-principal-comite', label: "Démolition d'un bâtiment principal avec autorisation du comité de démolition" },
+      { value: 'demolition-principal-non-assujetie', label: "Démolition d'un bâtiment principal non assujetti au comité de démolition" },
+      { value: 'enseigne-petite', label: "Enseigne de moins de 2,5m² (installation, modification, agrandissement, enlèvement, réinstallation)" },
+      { value: 'enseigne-grande', label: "Enseigne de plus de 2,5m² (installation, modification, agrandissement, enlèvement, réinstallation)" },
+      { value: 'installation-conteneur', label: "Installation d'un contenant de récupération de textiles" },
+      { value: 'installation-cloture', label: "Installation d'une clôture" },
       { value: 'nouvelle-construction', label: "Nouvelle construction d'un bâtiment principal" },
+      { value: 'ouvrage-rive', label: "Ouvrage dans la rive, le littoral ou la plaine inondable" },
       { value: 'transformation-renovation', label: "Transformation ou rénovation d'un bâtiment principal" },
+      { value: 'travaux-branchement', label: "Travaux de branchement privé au réseau d'aqueduc et/ou d'égout municipal" },
+      { value: 'travaux-remblai', label: "Travaux de remblai ou déblai" },
+      { value: 'trottoir-bordure', label: "Trottoir ou bordure de rue, demande de modification" },
     ],
     'construction-institutionnelle': [
       { value: 'addition-equipement', label: "Addition d'un équipement accessoire tel que composteur, compacteur, aire de jeux, etc." },
       { value: 'agrandissement-batiment', label: "Agrandissement d'un bâtiment principal" },
       { value: 'amenagement-espace', label: "Aménagement d'un espace de chargement ou de déchargement" },
       { value: 'amenagement-stationnement', label: "Aménagement, réaménagement ou agrandissement d'une aire de stationnement" },
+      { value: 'demolition-accessoire-comite', label: "Démolition d'un bâtiment accessoire avec autorisation du comité de démolition" },
+      { value: 'demolition-accessoire-non-assujetie', label: "Démolition d'un bâtiment accessoire non assujetti au comité de démolition" },
+      { value: 'demolition-principal-comite', label: "Démolition d'un bâtiment principal avec autorisation du comité de démolition" },
+      { value: 'demolition-principal-non-assujetie', label: "Démolition d'un bâtiment principal non assujetti au comité de démolition" },
+      { value: 'enseigne-petite', label: "Enseigne de moins de 2,5m² (installation, modification, agrandissement, enlèvement, réinstallation)" },
+      { value: 'enseigne-grande', label: "Enseigne de plus de 2,5m² (installation, modification, agrandissement, enlèvement, réinstallation)" },
+      { value: 'installation-conteneur', label: "Installation d'un contenant de récupération de textiles" },
+      { value: 'installation-cloture', label: "Installation d'une clôture" },
       { value: 'nouvelle-construction', label: "Nouvelle construction d'un bâtiment principal" },
+      { value: 'ouvrage-rive', label: "Ouvrage dans la rive, le littoral ou la plaine inondable" },
       { value: 'transformation-renovation', label: "Transformation ou rénovation d'un bâtiment principal" },
+      { value: 'travaux-branchement', label: "Travaux de branchement privé au réseau d'aqueduc et/ou d'égout municipal" },
+      { value: 'travaux-remblai', label: "Travaux de remblai ou déblai" },
+      { value: 'trottoir-bordure', label: "Trottoir ou bordure de rue, demande de modification" },
     ],
     'construction-subvention': [
       { value: 'demolition-principal-comite', label: "Démolition d'un bâtiment principal avec autorisation du comité de démolition" },
@@ -130,11 +182,34 @@ const PermitForm = () => {
       { value: 'autorisation-demolition-accessoire', label: "Autorisation de démolition d'un bâtiment accessoire pour un immeuble patrimonial" },
       { value: 'autorisation-demolition-accessoire-programme', label: "Autorisation de démolition d'un bâtiment accessoire pour un immeuble patrimonial avec programme S.H.Q., P.A.D. ou accès Logis" },
       { value: 'autorisation-demolition-1940', label: "Autorisation de démolition d'un immeuble construit avant 1940" },
+      { value: 'autorisation-demolition-1940-programme', label: "Autorisation de démolition d'un immeuble construit avant 1940 avec programme S.H.Q., P.A.D. ou accès Logis" },
+      { value: 'autorisation-demolition-1-3-log', label: "Autorisation de démolition d'un immeuble de 1 à 3 log. dans un quartier identifié" },
+      { value: 'autorisation-demolition-1-3-log-programme', label: "Autorisation de démolition d'un immeuble de 1 à 3 log. dans un quartier identifié avec programme S.H.Q,., P.A.D. ou accès Logis" },
+      { value: 'autorisation-demolition-patrimonial', label: "Autorisation de démolition d'un immeuble patrimonial ou à valeur patrimoniale potentielle" },
+      { value: 'autorisation-demolition-patrimonial-programme', label: "Autorisation de démolition d'un immeuble patrimonial ou à valeur patrimoniale potentielle avec programme S.H.Q., P.A.D. ou accès Logis" },
       { value: 'derogation-mineure', label: "Dérogation mineure" },
+      { value: 'derogation-mineure-programme', label: "Dérogation mineure avec programme S.H.Q., P.A.D. ou accès Logis" },
+      { value: 'derogation-mineure-residence', label: "Dérogation mineure sur un bâtiment résidentiel unifamiliale, bifamiliale ou trifamiliale (travaux déjà exécutés)" },
+      { value: 'modification-zonage', label: "Modification aux règlements de zonage" },
+      { value: 'modification-zonage-programme', label: "Modification aux règlements de zonage avec programme S.H.Q., P.A.D. ou accès Logis" },
       { value: 'piia-affichage', label: "P.I.I.A. Affichage" },
-      { value: 'piia-construction', label: "P.I.I.A. Construction et agrandissement d'un bâtiment mixte" },
-      { value: 'piia-residentiel', label: "P.I.I.A. Résidentiel - Construction et agrandissement" },
+      { value: 'piia-aire-contraintes', label: "P.I.I.A. Aire extérieure-zone de contraintes sonore" },
+      { value: 'piia-programme', label: "P.I.I.A. avec programme de subvention S.H.Q., P.A.D. ou accès Logis" },
+      { value: 'piia-construction-mixte', label: "P.I.I.A. Construction et agrandissement d'un bâtiment mixte" },
+      { value: 'piia-chargement', label: "P.I.I.A. D'une aire de chargement et déchargement" },
+      { value: 'piia-non-residentiel-construction', label: "P.I.I.A. Non résidentiel - Construction et agrandissement" },
+      { value: 'piia-non-residentiel-modification', label: "P.I.I.A. Non résidentiel - Modification ou transformation" },
+      { value: 'piia-non-residentiel-arbre', label: "P.I.I.A. Non-résidentiel - Abattage d'arbre(s)" },
+      { value: 'piia-residentiel-construction', label: "P.I.I.A. Résidentiel - Construction et agrandissement" },
+      { value: 'piia-residentiel-cadastre', label: "P.I.I.A. Résidentiel - Opération Cadastrale" },
+      { value: 'piia-residentiel-arbre', label: "P.I.I.A. Résidentiel- Abattage d'arbre(s)" },
+      { value: 'piia-residentiel-modification', label: "P.I.I.A. Résidentiel -Modification ou transformation" },
+      { value: 'piia-non-residentiel-stationnement', label: "PIIA Non-résidentiel - Aménagement agrandissement d'un stationnement" },
+      { value: 'piia-residentiel-stationnement', label: "PIIA Résidentiel - Aménagement agrandissement d'un stationnement" },
       { value: 'ppcmoi', label: "Projet particulier de construction, de modification ou d'occupation d'un immeuble (PPCMOI)" },
+      { value: 'ppcmoi-programme', label: "Projet particulier de construction, de modification ou d'occupation d'un immeuble avec programme S.H.Q., P.A.D. ou accès Logis" },
+      { value: 'revision-decision', label: "Révision d'une décision du comité de démolition" },
+      { value: 'sites-patrimoniaux', label: "Sites patrimoniaux" },
     ],
     'demande-subvention': [
       { value: 'pea', label: "PEA-Petits établissements accessibles" },
@@ -151,6 +226,11 @@ const PermitForm = () => {
       { value: 'occupation-3m', label: "Occupation de plus de 3 mètres dans la rue" },
       { value: 'parc-espace', label: "Parc et espace vert" },
       { value: 'piste-cyclable', label: "Piste cyclable hors-rue et sentier polyvalent" },
+      { value: 'prolongation', label: "Prolongation de l'autorisation d'occupation" },
+      { value: 'rue-50-3m', label: "Rue de 50 Km/h et plus, occupation de 3 mètres et moins" },
+      { value: 'rue-50-3m-trottoir', label: "Rue de 50 Km/h et plus, occupation de 3 mètres et moins incluant trottoir" },
+      { value: 'rue-moins-50-3m', label: "Rue de moins de 50 Km/h, occupation de 3 mètres et moins" },
+      { value: 'rue-moins-50-3m-trottoir', label: "Rue de moins de 50 Km/h, occupation de 3 mètres et moins incluant trottoir" },
       { value: 'trottoir-public', label: "Trottoir public" },
     ],
     'permis-lotissement': [
@@ -175,6 +255,18 @@ const PermitForm = () => {
       { value: 'consentement-autre', label: "1.7 RTU - Demande de consentement municipal - Autre" },
       { value: 'avis-hydro-avec', label: "2.1 RTU - Avis d'intervention - Hydro-Québec avec consentement" },
       { value: 'avis-hydro-sans', label: "2.1 RTU - Avis d'intervention - Hydro-Québec sans consentement" },
+      { value: 'avis-energir-avec', label: "2.2 RTU - Avis d'intervention - Energir avec consentement" },
+      { value: 'avis-energir-sans', label: "2.2 RTU - Avis d'intervention - Energir sans consentement" },
+      { value: 'avis-bell-avec', label: "2.3 RTU - Avis d'intervention - Bell avec consentement" },
+      { value: 'avis-bell-sans', label: "2.3 RTU - Avis d'intervention - Bell sans consentement" },
+      { value: 'avis-videotron-avec', label: "2.4 RTU - Avis d'intervention - Vidéotron avec consentement" },
+      { value: 'avis-videotron-sans', label: "2.4 RTU - Avis d'intervention - Vidéotron sans consentement" },
+      { value: 'avis-rogers-avec', label: "2.5 RTU - Avis d'intervention - Rogers avec consentement" },
+      { value: 'avis-rogers-sans', label: "2.5 RTU - Avis d'intervention - Rogers sans consentement" },
+      { value: 'avis-telus-avec', label: "2.6 RTU - Avis d'intervention - Telus avec consentement" },
+      { value: 'avis-telus-sans', label: "2.6 RTU - Avis d'intervention - Telus sans consentement" },
+      { value: 'avis-autre-avec', label: "2.7 RTU - Avis d'intervention - Autre avec consentement" },
+      { value: 'avis-autre-sans', label: "2.7 RTU - Avis d'intervention - Autre sans consentement" },
     ],
   };
 
@@ -202,6 +294,13 @@ const PermitForm = () => {
       const requiresDiscretionary = isConstructionCategory(category) && mockZoningGrid.hasPIIA;
       setShowDiscretionaryWarning(requiresDiscretionary);
       setNeedsDiscretionaryRequest(requiresDiscretionary);
+      
+      // Si l'utilisateur sélectionne la catégorie demande discrétionnaire, 
+      // on désactive le blocage de demande discrétionnaire
+      if (category === 'demande-discretionnaire') {
+        setNeedsDiscretionaryRequest(false);
+        setShowDiscretionaryWarning(false);
+      }
     }
   }, [category]);
 
@@ -213,7 +312,15 @@ const PermitForm = () => {
 
   // Gestionnaire de changement de catégorie
   const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
+    const newCategory = e.target.value;
+    
+    // Si l'utilisateur essaie de sélectionner une catégorie de construction alors qu'une demande
+    // discrétionnaire est nécessaire et n'a pas encore été réalisée
+    if (isConstructionCategory(newCategory) && mockZoningGrid.hasPIIA && !redirectToDiscretionary) {
+      setCategory(newCategory);
+    } else {
+      setCategory(newCategory);
+    }
   };
 
   // Gestionnaire de changement de nature
@@ -223,8 +330,11 @@ const PermitForm = () => {
 
   // Gestionnaire pour rediriger vers le formulaire de demande discrétionnaire
   const handleDiscretionaryRequest = () => {
-    // Simuler la redirection vers le formulaire de demande discrétionnaire
+    // En situation réelle, on redirigerait vers un autre formulaire
+    // Pour cette simulation, on change juste la catégorie
     setCategory('demande-discretionnaire');
+    setRedirectToDiscretionary(true);
+    setNeedsDiscretionaryRequest(false);
   };
 
   // Simuler le passage à l'étape suivante
@@ -318,6 +428,12 @@ const PermitForm = () => {
               </div>
             )}
           </div>
+          {/* Indicateur d'aide si aucune option n'est disponible */}
+          {category && natureOptions.length === 0 && (
+            <p className="mt-2 text-sm text-red-600">
+              Aucune option disponible pour cette catégorie.
+            </p>
+          )}
         </div>
         
         {/* Informations supplémentaires */}
